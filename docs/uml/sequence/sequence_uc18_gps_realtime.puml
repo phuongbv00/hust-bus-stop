@@ -1,0 +1,28 @@
+@startuml
+title Sequence - UC-18 GPS Realtime (Driver -> Students/Admin)
+actor "Tài xế App" as DriverApp
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "GPS Ingestion Service" as GPSSvc
+participant "WebSocket Hub" as WS
+database "DB" as DB
+participant "Kafka" as Kafka
+participant "Spark Jobs" as Spark
+actor "Sinh viên App" as StudentApp
+actor "Admin Dashboard" as AdminUI
+
+DriverApp -> API : POST /gps {lat,lon,tripId}
+API -> Auth : validate token
+Auth --> API : OK
+API -> GPSSvc : forward location(tripId, lat, lon, time)
+GPSSvc -> DB : validate trip/driver binding
+DB --> GPSSvc : OK
+GPSSvc -> DB : persist location
+GPSSvc -> Kafka : publish gps event
+GPSSvc -> WS : broadcast to subscribers(tripId)
+WS --> StudentApp : push location
+WS --> AdminUI : push location
+
+' Optional consumers
+Kafka -> Spark : async processing
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+title Sequence - UC-11 Gửi thông báo khẩn cấp
+actor "Admin Dashboard" as AdminUI
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Notification Service" as Notif
+database "DB" as DB
+participant "APNS/FCM" as Push
+participant "Clients" as Clients
+
+AdminUI -> API : POST /notifications/emergency {audience,content}
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> Notif : enqueue emergency
+API --> AdminUI : response
+Notif -> DB : resolve recipients (students/drivers)
+DB --> Notif : device tokens
+Notif -> Push : multicast push
+Push --> Clients : show alert
+
+@enduml

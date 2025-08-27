@@ -1,0 +1,123 @@
+@startuml
+title Class Diagram - Domain Model
+skinparam classAttributeIconSize 0
+
+class User {
+  +uuid id
+  +string name
+  +string email
+  +string role  // STUDENT, ADMIN, DRIVER
+}
+
+class Student {
+  +string studentCode
+  +string phone
+}
+
+class Driver {
+  +string licenseNumber
+  +string phone
+}
+
+class Vehicle {
+  +uuid id
+  +string plateNumber
+  +int seats
+  +string status
+}
+
+class Enrollment {
+  +uuid id
+  +string status // ACTIVE, PAUSED, CANCELED, PENDING
+  +string pickupAddress
+  +string schedulePref
+  +datetime createdAt
+}
+
+class Stop {
+  +uuid id
+  +string name
+  +decimal lat
+  +decimal lon
+}
+
+class Route {
+  +uuid id
+  +string name
+  +int orderIndex // sequence among routes of a plan
+}
+
+class RouteStop {
+  +int sequence
+  +datetime etaPlanned
+}
+
+class Trip {
+  +uuid id
+  +datetime startTime
+  +datetime endTime
+  +string status // PLANNED, STARTED, ARRIVED, FINISHED, CANCELED
+}
+
+class VehicleAssignment {
+  +uuid id
+  +date serviceDate
+}
+
+class CheckIn {
+  +uuid id
+  +datetime time
+  +string method // QR, OFFLINE_SYNC
+}
+
+class GPSLocation {
+  +uuid id
+  +decimal lat
+  +decimal lon
+  +datetime time
+  +uuid tripId
+}
+
+class Notification {
+  +uuid id
+  +string type // REMINDER, NEARBY, EMERGENCY
+  +string content
+  +datetime time
+}
+
+class Feedback {
+  +uuid id
+  +string title
+  +string content
+  +string status // NEW, IN_PROGRESS, RESOLVED
+}
+
+' Inheritance
+Student --|> User
+Admin --|> User
+Driver --|> User
+
+' Relationships
+Student "1" -- "*" Enrollment : owns >
+Enrollment "*" -- "1" Route : subscribes to >
+
+Route "1" -- "*" RouteStop : contains >
+RouteStop "*" -- "1" Stop : refers >
+
+Route "1" -- "*" Trip : planned >
+Trip "1" -- "*" GPSLocation : updates >
+Trip "1" -- "*" CheckIn : records >
+
+VehicleAssignment "1" -- "1" Trip : assigns >
+VehicleAssignment "1" -- "1" Driver : with >
+VehicleAssignment "1" -- "1" Vehicle : uses >
+
+Student "1" -- "*" CheckIn : performs >
+User "1" -- "*" Notification : receives >
+
+Admin "1" -- "*" Notification : sends >>  // conceptual role; Admin is User(role=ADMIN)
+
+Feedback "*" -- "1" Student : from >
+Feedback "*" -- "1" Admin : handled by >
+
+@enduml

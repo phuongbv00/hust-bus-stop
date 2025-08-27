@@ -1,0 +1,23 @@
+@startuml
+title Sequence - UC-07 Quản lý phương tiện & tài xế
+actor "Admin Dashboard" as AdminUI
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Trip & Route Service" as TripSvc
+database "DB" as DB
+
+AdminUI -> API : GET /vehicles, /drivers
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> TripSvc : list resources
+TripSvc -> DB : select vehicles/drivers
+DB --> TripSvc : data
+TripSvc --> API : data
+API --> AdminUI : render grids
+
+AdminUI -> API : POST /vehicles {plate,seats}
+API -> TripSvc : create vehicle
+TripSvc -> DB : insert vehicle
+DB --> TripSvc : ok
+API --> AdminUI : created
+@enduml

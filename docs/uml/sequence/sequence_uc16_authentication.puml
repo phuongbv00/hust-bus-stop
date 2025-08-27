@@ -1,0 +1,21 @@
+@startuml
+title Sequence - UC-16 Xác thực người dùng (OAuth2/OIDC)
+actor "User (Student/Admin/Driver)" as User
+participant "Client App/Web" as Client
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "IdP (Google/Azure)" as IdP
+
+User -> Client : Click "Đăng nhập với tài khoản nhà trường"
+Client -> API : /auth/login (redirect)
+API -> Auth : start oauth2 flow
+Auth -> IdP : Authorization Request
+IdP --> User : Login form
+User -> IdP : credentials
+IdP --> Auth : Authorization Code
+Auth -> IdP : Token Exchange
+IdP --> Auth : id_token, access_token
+Auth --> API : session / jwt
+API --> Client : set session, redirect back
+Client --> User : Logged in
+@enduml

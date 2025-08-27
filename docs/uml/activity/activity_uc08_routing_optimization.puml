@@ -1,0 +1,44 @@
+@startuml
+title Activity - UC-08 Tự động tạo lộ trình & lịch trình (TSP-based)
+start
+:Admin trigger "Tạo lộ trình tự động";
+:Load approved pickup stops (from UC-06);
+:Load constraints (vehicle seats, time windows, depots);
+:Fetch traffic matrix (distance/time) from Map API;
+
+if (Enough vehicles available?) then (yes)
+  :Initialize candidate routes set;
+else (no)
+  :Notify Admin insufficient vehicles;
+  stop
+endif
+
+repeat
+  :Cluster stops by geography/demand;
+  :Solve TSP/VRP per cluster (heuristic e.g., nearest neighbor + 2-opt);
+  :Estimate ETAs using traffic matrix;
+  :Build candidate route with ordered stops & schedule;
+repeat while (unassigned stops remain?) is (yes)
+
+:Evaluate candidates (cost: travel time, seat utilization, SLA);
+if (Cost improved vs best?) then (yes)
+  :Update best plan;
+endif
+
+:Produce 1..N route options (A, B, ...);
+:Persist proposals;
+:Present routes & schedules to Admin (map + tables);
+
+if (Admin tweaks order/time?) then (yes)
+  :Recalculate deltas & validate constraints;
+endif
+
+if (Admin approves?) then (yes)
+  :Mark plan as APPROVED;
+  :Publish plan events to Kafka;
+  :Store finalized routes in DB;
+else (no)
+  :Keep proposals for later;
+endif
+stop
+@enduml

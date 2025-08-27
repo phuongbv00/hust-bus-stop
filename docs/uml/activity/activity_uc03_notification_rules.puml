@@ -1,0 +1,31 @@
+@startuml
+title Activity - UC-03 Nhận thông báo tự động (Rules & Triggers)
+start
+:Identify triggers:
+ - reminder before pickup
+ - bus near stop
+ - admin broadcast
+ - driver updates;
+
+if (Reminder scheduler tick?) then (yes)
+  :Find upcoming trips per student;
+  :Create reminder notifications;
+endif
+
+if (GPS event received?) then (yes)
+  :Match to subscribed students by trip/stop;
+  :Check distance threshold to stop;
+  if (Within threshold?) then (yes)
+    :Create "bus near" notification;
+  endif
+endif
+
+if (Admin broadcast?) then (yes)
+  :Select target audience;
+  :Create emergency notification;
+endif
+
+:Enqueue notifications to push service (UC-17);
+:Record notification logs;
+stop
+@enduml

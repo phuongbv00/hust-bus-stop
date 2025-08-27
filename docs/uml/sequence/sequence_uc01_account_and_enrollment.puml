@@ -1,0 +1,31 @@
+@startuml
+title Sequence - UC-01 Quản lý tài khoản & đăng ký dịch vụ
+actor "Sinh viên App" as StudentApp
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "User & Enrollment Service" as UserSvc
+database "DB" as DB
+participant "Notification Service" as Notif
+
+== Đăng nhập (include UC-16) ==
+StudentApp -> API : Login / OAuth2 code
+API -> Auth : Exchange code -> token
+Auth --> API : id/access token
+API --> StudentApp : session established
+
+== Xem & cập nhật thông tin ==
+StudentApp -> API : GET /me, /enrollments
+API -> UserSvc : fetch profile/enrollments
+UserSvc -> DB : select user/enrollment
+DB --> UserSvc : data
+UserSvc --> API : data
+API --> StudentApp : render form
+
+StudentApp -> API : PUT /enrollments {address,schedule,status}
+API -> UserSvc : validate & update
+UserSvc -> DB : upsert enrollment
+DB --> UserSvc : ok
+UserSvc --> API : updated
+API -> Notif : push confirmation (optional)
+API --> StudentApp : success
+@enduml

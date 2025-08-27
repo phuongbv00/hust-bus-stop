@@ -1,0 +1,25 @@
+@startuml
+title Sequence - UC-14 Tài xế xem nhiệm vụ & lộ trình
+actor "Tài xế App" as DriverApp
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Dispatching Service" as Dispatch
+participant "Trip & Route Service" as TripSvc
+database "DB" as DB
+
+DriverApp -> API : GET /me/assignments (today)
+API -> Auth : validate driver token
+Auth --> API : OK
+API -> Dispatch : list assignments
+Dispatch -> DB : query assignments for driver
+DB --> Dispatch : data
+Dispatch --> API : list
+API --> DriverApp : list
+
+DriverApp -> API : GET /trips/{id}/detail
+API -> TripSvc : fetch trip, route, stops
+TripSvc -> DB : query
+DB --> TripSvc : data
+TripSvc --> API : detail
+API --> DriverApp : show map & steps
+@enduml

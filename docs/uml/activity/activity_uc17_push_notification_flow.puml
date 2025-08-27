@@ -1,0 +1,31 @@
+@startuml
+title Activity - UC-17 Gửi thông báo đẩy (Flow)
+start
+:Receive notification request
+(event/userIds, title, body, data);
+:Validate audience & content;
+
+:Resolve recipients -> devices;
+if (Any device tokens?) then (yes)
+  :Build platform-specific payloads;
+  fork
+    :Send to FCM (Android/Web);
+    :Handle responses ->
+     - success
+     - invalid token
+     - rate limit;
+  fork again
+    :Send to APNS (iOS);
+    :Handle responses similarly;
+  end fork
+  :Update delivery logs;
+  :Deactivate invalid tokens;
+else (no)
+  :No-op (no devices);
+endif
+
+if (Retry needed?) then (yes)
+  :Schedule exponential backoff;
+endif
+stop
+@enduml

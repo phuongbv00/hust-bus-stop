@@ -1,0 +1,30 @@
+@startuml
+title Activity - UC-15 Cập nhật trạng thái chuyến đi (Lifecycle)
+start
+:Driver opens trip detail;
+:Show actions: START, ARRIVED at stop, FINISH;
+
+if (Press START?) then (yes)
+  :Validate driver assignment;
+  :Set status=STARTED;
+  :Publish event;
+  :Start periodic GPS upload;
+endif
+
+repeat
+  if (Arrived at planned stop?) then (yes)
+    :Set status=ARRIVED(stopId);
+    :Notify waiting students;
+  endif
+repeat while (More stops?) is (yes)
+
+if (Press FINISH?) then (yes)
+  :Validate all stops processed;
+  :Set status=FINISHED;
+  :Stop GPS upload;
+  :Publish summary event;
+else (no)
+  :Keep in-progress;
+endif
+stop
+@enduml

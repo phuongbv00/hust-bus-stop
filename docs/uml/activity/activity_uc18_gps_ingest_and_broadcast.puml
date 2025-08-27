@@ -1,0 +1,31 @@
+@startuml
+title Activity - UC-18 Xử lý dữ liệu vị trí GPS (Ingest & Broadcast)
+start
+:Driver app emits GPS (lat, lon, time, tripId);
+:API receives and authenticates request;
+if (Auth ok?) then (yes)
+  :Validate trip-driver binding;
+  if (Valid?) then (yes)
+    :Persist location to DB (append-only);
+    :Publish gps event to Kafka;
+    :Broadcast via WebSocket to subscribers;
+  else (no)
+    :Reject with 403 / log incident;
+  endif
+else (no)
+  :Reject with 401;
+endif
+
+fork
+  :Async consumer (Spark):
+   - enrich with map-matching
+   - compute speed, heading
+   - detect anomalies;
+  :Write curated stream to S3/DB;
+fork again
+  :Trigger proximity alerts for students
+   near next stop;
+  :Send push notifications if needed;
+end fork
+stop
+@enduml

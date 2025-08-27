@@ -1,0 +1,26 @@
+@startuml
+title Sequence - UC-05 Quản lý đăng ký của sinh viên
+actor "Admin Dashboard" as AdminUI
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "User & Enrollment Service" as UserSvc
+participant "Notification Service" as Notif
+database "DB" as DB
+
+AdminUI -> API : GET /enrollments?status=PENDING
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> UserSvc : list pending enrollments
+UserSvc -> DB : query enrollments
+DB --> UserSvc : data
+UserSvc --> API : data
+API --> AdminUI : show list
+
+AdminUI -> API : POST /enrollments/{id}/approve
+API -> UserSvc : approve enrollment
+UserSvc -> DB : update status=ACTIVE
+DB --> UserSvc : ok
+UserSvc --> API : ok
+API -> Notif : send approval message
+API --> AdminUI : success
+@enduml

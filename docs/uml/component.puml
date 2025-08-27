@@ -1,0 +1,85 @@
+@startuml
+title Component Architecture - Student Shuttle Management System
+skinparam componentStyle rectangle
+left to right direction
+
+actor "Student" as Student
+actor "Admin" as Admin
+actor "Tài xế" as Driver
+
+rectangle "Client" {
+  component "Mobile App\n(Sinh viên)" as MobileStudent
+  component "Mobile App\n(Tài xế)" as MobileDriver
+  component "Web Dashboard\n(Admin)" as WebAdmin
+}
+
+package "Backend" {
+  component "API Gateway /\nBFF (REST/GraphQL)" as APIGW
+  component "Auth Service\n(OAuth2/OIDC)" as Auth
+  component "User & Enrollment\nService" as UserSvc
+  component "Trip & Route\nService" as TripSvc
+  component "Check-in Service" as CheckinSvc
+  component "Notification Service\n(APNS/FCM)" as NotifSvc
+  component "GPS Ingestion\n& Realtime Service" as GPSSvc
+  component "Dispatching Service" as DispatchSvc
+  component "Analytics & Reporting\nService" as AnalyticsSvc
+}
+
+package "Data & Infra" {
+  component "PostgreSQL\n(Main DB)" as DB
+  component "Kafka\n(Message Broker)" as Kafka
+  component "Spark / Batch\nOptimization Jobs" as Spark
+  component "Object Storage\n(S3)" as S3
+  component "Map/Traffic API\n(External)" as MapAPI
+  component "IdP (Google/Azure)\n(External)" as IdP
+  component "APNS/FCM\n(External)" as Push
+}
+
+' Client interactions
+Student --> MobileStudent
+Driver --> MobileDriver
+Admin --> WebAdmin
+
+MobileStudent --> APIGW
+MobileDriver --> APIGW
+WebAdmin --> APIGW
+
+' Auth
+APIGW --> Auth : OAuth2/OIDC
+Auth --> IdP : Redirect / Token Exchange
+
+' Core services behind API
+APIGW --> UserSvc
+APIGW --> TripSvc
+APIGW --> CheckinSvc
+APIGW --> NotifSvc
+APIGW --> GPSSvc
+APIGW --> DispatchSvc
+APIGW --> AnalyticsSvc
+
+' Data stores and streams
+UserSvc --> DB
+TripSvc --> DB
+CheckinSvc --> DB
+AnalyticsSvc --> DB
+DispatchSvc --> DB
+
+GPSSvc --> Kafka : publish location events
+CheckinSvc --> Kafka : publish check-in events
+TripSvc --> Kafka : publish trip state events
+
+Spark --> Kafka : consume events
+Spark --> S3 : write curated data
+Spark --> DB : write aggregates
+
+DispatchSvc --> Kafka : consume plans/events
+AnalyticsSvc --> Kafka : consume events
+
+' Notifications
+NotifSvc --> Push : send push messages
+
+' External map/traffic
+TripSvc --> MapAPI : traffic/ETA
+Spark --> MapAPI : routing/ETA batch
+
+@enduml

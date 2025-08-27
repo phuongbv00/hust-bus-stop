@@ -1,0 +1,26 @@
+@startuml
+title Sequence - UC-10 Giám sát hoạt động theo thời gian thực
+actor "Admin Dashboard" as AdminUI
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Trip & Route Service" as TripSvc
+participant "WebSocket Hub" as WS
+participant "GPS Realtime Service" as GPSSvc
+participant "Kafka" as Kafka
+database "DB" as DB
+
+AdminUI -> API : GET /dashboard/overview
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> TripSvc : fetch active trips, statuses
+TripSvc -> DB : query
+DB --> TripSvc : data
+TripSvc --> API : data
+API --> AdminUI : render map and list
+
+AdminUI -> WS : CONNECT /ws?role=admin
+WS --> AdminUI : ACK
+GPSSvc -> WS : broadcast gps updates
+WS --> AdminUI : update markers
+Kafka -> API : stream alerts (optional)
+@enduml

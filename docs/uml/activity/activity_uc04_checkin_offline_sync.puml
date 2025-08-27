@@ -1,0 +1,48 @@
+@startuml
+title Activity - UC-04 Check-in khi lên xe (QR + Offline Sync)
+start
+:Open app -> Check-in;
+:Scan QR (tripId);
+:Capture timestamp;
+
+if (Has network?) then (yes)
+  :Validate access token;
+  if (Token valid?) then (yes)
+    :Call Check-in API;
+    :Validate QR (tripId, time window);
+    if (Valid & in window?) then (yes)
+      :Persist CheckIn(tripId, userId, time);
+      :Publish check-in event;
+      :Show success to student;
+      :Optionally notify driver device;
+    else (no)
+      :Show error (invalid/expired);
+    endif
+  else (no)
+    :Prompt re-login;
+  endif
+else (no)
+  :Store pending check-in locally
+  (tripId, userId, time);
+  :Show "Saved offline" message;
+endif
+
+' Later background sync
+fork
+  :Periodic/Manual Sync Trigger;
+  if (Network restored?) then (yes)
+    :Batch upload pending check-ins;
+    :Server validate & upsert;
+    :Mark local items as synced;
+  else (no)
+    :Keep in retry queue;
+  endif
+fork again
+  :Listen to trip state changes;
+  if (Trip canceled?) then (yes)
+    :Discard pending items for that trip;
+  endif
+end fork
+
+stop
+@enduml

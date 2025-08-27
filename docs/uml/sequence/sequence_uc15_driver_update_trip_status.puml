@@ -1,0 +1,28 @@
+@startuml
+title Sequence - UC-15 Tài xế cập nhật trạng thái chuyến đi
+actor "Tài xế App" as DriverApp
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Trip & Route Service" as TripSvc
+participant "GPS Realtime Service" as GPSSvc
+participant "Notification Service" as Notif
+participant "Kafka" as Kafka
+database "DB" as DB
+
+DriverApp -> API : POST /trips/{id}/status {STARTED/ARRIVED/FINISHED}
+API -> Auth : validate driver token
+Auth --> API : OK
+API -> TripSvc : update status
+TripSvc -> DB : update trip status
+DB --> TripSvc : ok
+TripSvc -> Kafka : publish trip state event
+API --> DriverApp : ok
+
+== GPS liên quan (include UC-18) ==
+DriverApp -> API : POST /gps {tripId,lat,lon}
+API -> GPSSvc : forward & persist
+GPSSvc -> DB : insert gps
+GPSSvc -> Kafka : publish gps
+
+Kafka -> Notif : trigger near-stop alert (optional)
+@enduml

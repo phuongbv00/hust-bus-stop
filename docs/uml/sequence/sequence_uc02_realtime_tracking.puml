@@ -1,0 +1,26 @@
+@startuml
+title Sequence - UC-02 Xem lịch trình & theo dõi xe realtime
+actor "Sinh viên App" as StudentApp
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Trip & Route Service" as TripSvc
+participant "WebSocket Hub" as WS
+database "DB" as DB
+participant "GPS Realtime Service" as GPSSvc
+
+== Khởi tạo ==
+StudentApp -> API : GET /routes, /stops, /trips
+API -> Auth : validate token
+Auth --> API : OK
+API -> TripSvc : fetch planned trips & stops
+TripSvc -> DB : query routes/stops/trips
+DB --> TripSvc : data
+TripSvc --> API : data
+API --> StudentApp : render map & schedule
+
+== Subscribe realtime (include UC-18) ==
+StudentApp -> WS : CONNECT /ws?tripId=...
+WS --> StudentApp : ACK
+GPSSvc -> WS : broadcast gps(tripId,lat,lon)
+WS --> StudentApp : update marker
+@enduml

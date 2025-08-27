@@ -1,0 +1,33 @@
+@startuml
+title Use Case - Tác nhân: Sinh viên
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Sinh viên" as Student
+
+rectangle "Ứng dụng Di động (Sinh viên)" {
+  usecase "UC-01: Quản lý\ntài khoản &\nđăng ký dịch vụ" as UC01
+  usecase "UC-02: Xem lịch trình\n& theo dõi xe realtime" as UC02
+  usecase "UC-03: Nhận thông báo\ntự động" as UC03
+  usecase "UC-04: Check-in khi lên xe\n(QR, offline sync)" as UC04
+}
+
+rectangle "Dịch vụ nền tảng" {
+  usecase "UC-16: Xác thực\nngười dùng (OAuth2/OIDC)" as UC16
+  usecase "UC-17: Gửi thông báo\nđẩy (APNS/FCM)" as UC17
+  usecase "UC-18: Xử lý dữ liệu\nvị trí GPS" as UC18
+}
+
+Student -- UC01
+Student -- UC02
+Student -- UC03
+Student -- UC04
+
+' Include relationships
+UC01 ..> UC16 : <<include>>
+UC02 ..> UC16 : <<include>>
+UC02 ..> UC18 : <<include>>
+UC03 ..> UC17 : <<include>>
+UC04 ..> UC16 : <<include>>
+@enduml

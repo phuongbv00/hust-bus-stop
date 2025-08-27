@@ -1,0 +1,26 @@
+@startuml
+title Sequence - UC-06 Phân tích & thiết lập điểm đón tự động
+actor "Admin Dashboard" as AdminUI
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Analytics Service" as Analytics
+participant "Spark Batch Jobs" as Spark
+participant "Kafka" as Kafka
+database "DB" as DB
+
+AdminUI -> API : POST /analysis/pickup-points/run
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> Analytics : trigger job request
+Analytics -> Kafka : publish job command
+
+Spark -> Kafka : consume job command
+Spark -> DB : read enrollments & geo data
+DB --> Spark : data
+Spark -> DB : write proposed pickup points
+Spark -> Kafka : publish job result
+
+Kafka -> Analytics : notify result
+Analytics -> API : job completed
+API --> AdminUI : show proposals
+@enduml

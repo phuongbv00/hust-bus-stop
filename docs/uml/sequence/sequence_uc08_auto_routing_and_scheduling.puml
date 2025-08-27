@@ -1,0 +1,29 @@
+@startuml
+title Sequence - UC-08 Tự động tạo lộ trình & lịch trình
+actor "Admin Dashboard" as AdminUI
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Trip & Route Service" as TripSvc
+participant "Spark Batch Jobs" as Spark
+participant "Kafka" as Kafka
+participant "Map/Traffic API" as MapAPI
+database "DB" as DB
+
+AdminUI -> API : POST /routing/auto-plan/run
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> Kafka : publish auto-plan command
+
+Spark -> Kafka : consume command
+Spark -> DB : load approved stops
+DB --> Spark : stops
+Spark -> MapAPI : fetch distance matrix
+MapAPI --> Spark : matrix
+Spark -> DB : write route candidates & schedule
+Spark -> Kafka : publish plan result
+
+Kafka -> TripSvc : new plan event
+TripSvc -> DB : persist routes/trips
+TripSvc --> API : plan ready
+API --> AdminUI : present options (A,B,...)
+@enduml

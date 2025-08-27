@@ -1,0 +1,34 @@
+@startuml
+title Sequence - UC-13 Quản lý phản hồi của người dùng
+actor "Admin Dashboard" as AdminUI
+actor "Sinh viên App" as StudentApp
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Analytics/Feedback Service" as FeedbackSvc
+database "DB" as DB
+
+== Sinh viên gửi phản hồi ==
+StudentApp -> API : POST /feedback {title,content}
+API -> Auth : validate token
+Auth --> API : OK
+API -> FeedbackSvc : create feedback
+FeedbackSvc -> DB : insert
+DB --> FeedbackSvc : ok
+API --> StudentApp : created
+
+== Admin xử lý phản hồi ==
+AdminUI -> API : GET /feedback?status=NEW
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> FeedbackSvc : list feedback
+FeedbackSvc -> DB : query
+DB --> FeedbackSvc : data
+FeedbackSvc --> API : list
+API --> AdminUI : show
+
+AdminUI -> API : PATCH /feedback/{id} {status}
+API -> FeedbackSvc : update status
+FeedbackSvc -> DB : update
+DB --> FeedbackSvc : ok
+API --> AdminUI : ok
+@enduml

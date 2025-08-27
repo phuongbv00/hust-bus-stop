@@ -1,0 +1,28 @@
+@startuml
+title Sequence - UC-03 Nhận thông báo tự động
+actor "Sinh viên App" as StudentApp
+participant "API Gateway" as API
+participant "Notification Service" as Notif
+participant "Trip & Route Service" as TripSvc
+participant "Check-in Service" as Checkin
+participant "Kafka" as Kafka
+participant "APNS/FCM" as Push
+database "DB" as DB
+
+== Đăng ký token thiết bị ==
+StudentApp -> API : POST /devices {pushToken}
+API -> Notif : register device
+Notif -> DB : upsert device token
+DB --> Notif : ok
+API --> StudentApp : ok
+
+== Sự kiện kích hoạt ==
+TripSvc -> Kafka : publish trip ETA soon
+Checkin -> Kafka : publish check-in created
+
+Kafka -> Notif : consume events
+Notif -> DB : resolve recipients
+DB --> Notif : users/devices
+Notif -> Push : send notifications
+Push --> StudentApp : display notification
+@enduml

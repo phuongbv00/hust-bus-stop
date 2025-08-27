@@ -1,0 +1,29 @@
+@startuml
+title Activity - UC-12 Báo cáo & Thống kê (Pipeline)
+start
+:Define report request (type, time range);
+:Check cache for precomputed dataset;
+if (Cache hit?) then (yes)
+  :Load dataset;
+  :Render charts/tables;
+  stop
+else (no)
+  :Trigger/Use latest aggregates;
+endif
+
+fork
+  :Ingest events (gps, checkin, trips) from Kafka;
+  :ETL in Spark: cleanse, join, aggregate by date/route/trip;
+  :Persist aggregates to DB/S3 (fact tables);
+fork again
+  :Schedule batch recomputation daily;
+  :Backfill missing partitions if needed;
+end fork
+
+:Query aggregates for the request;
+:Compute KPIs (on-time %, utilization, check-in ratio);
+:Format result dataset;
+:Cache result for TTL;
+:Return report to dashboard;
+stop
+@enduml

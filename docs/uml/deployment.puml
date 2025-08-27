@@ -1,0 +1,80 @@
+@startuml
+title Deployment Diagram - Hệ thống Quản lý Xe buýt Sinh viên
+skinparam nodeStyle rectangle
+left to right direction
+
+node "Sinh viên Device" {
+  artifact "Mobile App (Student)" as AppStudent
+}
+
+node "Tài xế Device" {
+  artifact "Mobile App (Driver)" as AppDriver
+}
+
+node "Admin Workstation" {
+  artifact "Web Browser" as Browser
+}
+
+node "Internet / CDN" as CDN
+
+node "DMZ" {
+  node "Load Balancer / API Gateway" as LB
+}
+
+node "App Cluster" {
+  node "App Server" as AppSrv {
+    artifact "BFF/API Service" as API
+    artifact "Realtime WS" as WS
+  }
+}
+
+node "Streaming Cluster" {
+  node "Kafka Cluster" as Kafka {
+    artifact "Topics: gps, checkin, trips, dispatch" as Topics
+  }
+}
+
+node "Batch/Analytics" {
+  node "Spark Cluster" as Spark {
+    artifact "Batch Jobs (UC-06, UC-08, UC-09, UC-12)" as BatchJobs
+  }
+}
+
+node "Data Layer" {
+  database "PostgreSQL" as DB
+  node "Object Storage (S3)" as S3
+}
+
+node "External Services" {
+  node "IdP (Google/Azure)" as IdP
+  node "APNS/FCM" as Push
+  node "Map/Traffic API" as MapAPI
+}
+
+' Client connections
+AppStudent --> CDN
+AppDriver --> CDN
+Browser --> CDN
+CDN --> LB
+LB --> AppSrv
+
+' Intra service
+API --> DB
+API --> WS
+WS --> Kafka
+API --> Kafka
+Spark --> Kafka
+Spark --> S3
+Spark --> DB
+
+' External integrations
+API --> IdP : OAuth2/OIDC
+API --> Push : send notifications
+API --> MapAPI : routing/ETA
+
+' Flows of interest
+AppDriver --> LB : GPS updates (HTTPS)
+LB --> WS : WebSocket broadcast to Student/Admin
+API --> Kafka : publish check-in, trip events
+
+@enduml

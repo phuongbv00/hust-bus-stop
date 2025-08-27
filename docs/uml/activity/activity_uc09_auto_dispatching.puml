@@ -1,0 +1,47 @@
+@startuml
+title Activity - UC-09 Tự động điều phối phương tiện
+start
+:Scheduled time reached (e.g., 16:00 daily);
+:Load next-day trips (routes, ETAs, capacities);
+:Load vehicles (seats, maintenance, status);
+:Load drivers (availability, qualifications, rest time);
+
+:Build optimization model (constraints & objective);
+
+repeat
+  :Select unassigned trip with highest priority;
+  :Find feasible vehicle-driver pairs:
+   - seats >= demand
+   - no schedule conflict
+   - driver hours within regulation;
+  if (Feasible pair found?) then (yes)
+    :Score pairs (utilization, deadhead, fairness);
+    :Choose best pair;
+    :Assign trip -> (vehicle, driver);
+  else (no)
+    :Mark trip as exception;
+  endif
+repeat while (unassigned trips remain?) is (yes)
+
+:Compute KPIs (utilization, overtime risk);
+:Persist proposed assignments;
+:Publish dispatch plan event;
+
+if (Admin manual adjustments?) then (yes)
+  :Apply changes (swap driver/vehicle);
+  :Re-validate constraints;
+  if (Violation?) then (yes)
+    :Reject change & notify;
+  else (no)
+    :Accept change;
+  endif
+endif
+
+if (Approve plan?) then (yes)
+  :Mark plan APPROVED;
+  :Notify drivers (push messages);
+else (no)
+  :Keep plan DRAFT;
+endif
+stop
+@enduml
