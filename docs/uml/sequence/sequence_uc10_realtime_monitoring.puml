@@ -6,7 +6,6 @@ participant "Auth Service" as Auth
 participant "Trip & Route Service" as TripSvc
 participant "WebSocket Hub" as WS
 participant "GPS Realtime Service" as GPSSvc
-participant "Kafka" as Kafka
 database "DB" as DB
 
 AdminUI -> API : GET /dashboard/overview
@@ -22,5 +21,4 @@ AdminUI -> WS : CONNECT /ws?role=admin
 WS --> AdminUI : ACK
 GPSSvc -> WS : broadcast gps updates
 WS --> AdminUI : update markers
-Kafka -> API : stream alerts (optional)
 @enduml

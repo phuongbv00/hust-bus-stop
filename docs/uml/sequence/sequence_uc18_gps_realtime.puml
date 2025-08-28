@@ -1,6 +1,6 @@
 @startuml
 title Sequence - UC-18 GPS Realtime (Driver -> Students/Admin)
-actor "Tài xế App" as DriverApp
+actor "Driver App" as DriverApp
 participant "API Gateway" as API
 participant "Auth Service" as Auth
 participant "GPS Ingestion Service" as GPSSvc
@@ -8,7 +8,7 @@ participant "WebSocket Hub" as WS
 database "DB" as DB
 participant "Kafka" as Kafka
 participant "Spark Jobs" as Spark
-actor "Sinh viên App" as StudentApp
+actor "Student App" as StudentApp
 actor "Admin Dashboard" as AdminUI
 
 DriverApp -> API : POST /gps {lat,lon,tripId}
