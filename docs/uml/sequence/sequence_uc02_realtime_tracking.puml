@@ -1,6 +1,6 @@
 @startuml
 title Sequence - UC-02 Xem lịch trình & theo dõi xe realtime
-actor "Sinh viên App" as StudentApp
+actor "Student App" as StudentApp
 participant "API Gateway" as API
 participant "Auth Service" as Auth
 participant "Trip & Route Service" as TripSvc

@@ -1,6 +1,6 @@
 @startuml
 title Sequence - UC-04 Check-in khi lên xe (QR + offline)
-actor "Sinh viên App" as StudentApp
+actor "Student App" as StudentApp
 participant "API Gateway" as API
 participant "Auth Service" as Auth
 participant "Check-in Service" as Checkin

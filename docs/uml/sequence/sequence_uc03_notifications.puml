@@ -1,6 +1,6 @@
 @startuml
 title Sequence - UC-03 Nhận thông báo tự động
-actor "Sinh viên App" as StudentApp
+actor "Student App" as StudentApp
 participant "API Gateway" as API
 participant "Notification Service" as Notif
 participant "Trip & Route Service" as TripSvc
