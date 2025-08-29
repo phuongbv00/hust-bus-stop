@@ -4,9 +4,8 @@ left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome
 
-actor "Quản trị viên" as Admin
+actor "Admin" as Admin
 
-rectangle "Dashboard Admin" {
   usecase "UC-05: Quản lý\nđăng ký sinh viên" as UC05
   usecase "UC-06: Phân tích &\nthiết lập điểm đón" as UC06
   usecase "UC-07: Quản lý\nphương tiện & tài xế" as UC07
@@ -16,13 +15,10 @@ rectangle "Dashboard Admin" {
   usecase "UC-11: Gửi thông báo\nkhẩn cấp" as UC11
   usecase "UC-12: Báo cáo &\nthống kê" as UC12
   usecase "UC-13: Quản lý\nphản hồi" as UC13
-}
 
-rectangle "Dịch vụ nền tảng" {
   usecase "UC-16: Xác thực\nngười dùng (OAuth2/OIDC)" as UC16
   usecase "UC-17: Gửi thông báo\nđẩy (APNS/FCM)" as UC17
   usecase "UC-18: Xử lý dữ liệu\nvị trí GPS" as UC18
-}
 
 Admin -- UC05
 Admin -- UC06

@@ -1,20 +1,16 @@
 @startuml
-title Use Case - Actor: Driver
+title Use Case - Actor: Tài xế
 left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome
 
 actor "Driver" as Driver
 
-rectangle "Mobile App (Driver)" {
   usecase "UC-14: View assignments\n& route" as UC14
   usecase "UC-15: Update trip\nstatus" as UC15
-}
 
-rectangle "Platform Services" {
   usecase "UC-16: User authentication\n(OAuth2/OIDC)" as UC16
   usecase "UC-18: GPS location data\nprocessing" as UC18
-}
 
 Driver -- UC14
 Driver -- UC15

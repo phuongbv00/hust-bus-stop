@@ -17,6 +17,7 @@ Analytics -> Kafka : publish job command
 Spark -> Kafka : consume job command
 Spark -> DB : read enrollments & geo data
 DB --> Spark : data
+Spark -> Spark : analyze & compute
 Spark -> DB : write proposed pickup points
 Spark -> Kafka : publish job result
 

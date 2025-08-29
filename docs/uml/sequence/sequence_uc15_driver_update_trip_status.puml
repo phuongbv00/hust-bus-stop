@@ -9,7 +9,7 @@ participant "Notification Service" as Notif
 participant "Kafka" as Kafka
 database "DB" as DB
 
-DriverApp -> API : POST /trips/{id}/status {STARTED/ARRIVED/FINISHED}
+DriverApp -> API : POST /trips/{id}/status
 API -> Auth : validate driver token
 Auth --> API : OK
 API -> TripSvc : update status

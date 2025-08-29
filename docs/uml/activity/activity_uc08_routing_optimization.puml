@@ -15,7 +15,7 @@ endif
 
 repeat
   :Cluster stops by geography/demand;
-  :Solve TSP/VRP per cluster (heuristic e.g., nearest neighbor + 2-opt);
+  :Solve TSP per cluster (heuristic e.g., nearest neighbor + 2-opt);
   :Estimate ETAs using traffic matrix;
   :Build candidate route with ordered stops & schedule;
 repeat while (unassigned stops remain?) is (yes)

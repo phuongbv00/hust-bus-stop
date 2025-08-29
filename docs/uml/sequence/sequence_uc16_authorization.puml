@@ -1,0 +1,33 @@
+@startuml
+title Sequence - UC-16 Xác thực và uỷ quyền (OAuth2/OIDC - Authorization Code with PKCE)
+actor "User" as User
+participant "Client App/Web" as Client
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "IdP (Google/Azure)" as IdP
+collections "Resource Servers" as ResourceServer
+
+User -> Client : Interact
+
+Client -> API: Request protected resource
+API -> Auth: Verify token
+
+alt No token or invalid token
+  Auth --> API: Invalid token
+  API --> Client: 401 Unauthorized
+  Client -> Client : Generate code_verifier, code_challenge(S256), state, nonce
+  Client -> IdP : Authorization Request\n(response_type=code, code_challenge, code_challenge_method=S256,\n state, nonce, redirect_uri)
+  IdP --> User : Login form
+  User -> IdP : Enter credentials / consent
+  IdP --> Client : Redirect back with code, state (to redirect_uri)
+  Client -> IdP : Token Exchange\n(grant_type=authorization_code, code, code_verifier, redirect_uri)
+  IdP --> Client : id_token, access_token, refresh_token
+  Client -> API : Relay request protected resource \nAuthorization: Bearer access_token?
+  API -> Auth : Verify token
+end
+Auth --> API: Valid token
+API -> ResourceServer : Delegate request
+ResourceServer --> API : Response
+API --> Client : 200 OK + resource
+Client --> User : Response
+@enduml

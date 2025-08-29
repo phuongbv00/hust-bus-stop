@@ -1,0 +1,44 @@
+@startuml
+title Sequence - UC-09 Tự động điều phối phương tiện
+actor "Admin Dashboard" as AdminUI
+participant "API Gateway" as API
+participant "Auth Service" as Auth
+participant "Trip Service" as Trip
+participant "Spark Batch Jobs" as Spark
+participant "Kafka" as Kafka
+database "DB" as DB
+
+== Lên lịch tự động ==
+...[At 16:00 daily]...
+Trip -> DB : read next-day trips, vehicles, drivers
+DB --> Trip : data
+Trip -> Spark : trigger optimization
+Spark -> DB : read capacity & constraints
+DB --> Spark : data
+Spark -> Spark : optimize trip assigment
+Spark -> DB : write proposed trips
+
+==Điều chỉnh thủ công==
+AdminUI -> API : GET /trip?date=tomorrow
+ref over AdminUI, API, Auth
+    UC-16 Authorization Flow
+end ref
+API -> Trip : get proposed trips
+Trip -> DB : read proposed trips
+DB --> Trip : data
+Trip --> AdminUI : proposed trips
+AdminUI -> API : PUT /trip/{id} (vehicle,driver)
+API -> Trip : update trip
+Trip -> DB : update trip
+DB --> Trip : ok
+Trip --> AdminUI : ok
+==Phê duyệt==
+AdminUI -> API : POST /trip/{id}/approve
+ref over AdminUI, API, Auth
+    UC-16 Authorization Flow
+end ref
+API -> Trip : approve trip
+Trip -> DB: mark as approved
+DB --> Trip : ok
+Trip --> AdminUI : ok
+@enduml

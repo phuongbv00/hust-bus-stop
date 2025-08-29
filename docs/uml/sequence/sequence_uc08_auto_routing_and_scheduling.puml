@@ -19,6 +19,7 @@ Spark -> DB : load approved stops
 DB --> Spark : stops
 Spark -> MapAPI : fetch distance matrix
 MapAPI --> Spark : matrix
+Spark -> Spark: optimize routes & schedule
 Spark -> DB : write route candidates & schedule
 Spark -> Kafka : publish plan result
 
@@ -26,4 +27,28 @@ Kafka -> TripSvc : new plan event
 TripSvc -> DB : persist routes/trips
 TripSvc --> API : plan ready
 API --> AdminUI : present options (A,B,...)
+
+== Điều chỉnh thủ công ==
+AdminUI -> API : PATCH /routing/auto-plan/tweak (order/time)
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> TripSvc : apply tweaks & validate constraints
+TripSvc -> DB : read/write affected routes
+DB --> TripSvc : ok
+TripSvc --> API : updated options
+API --> AdminUI : present updated options
+
+== Phê duyệt ==
+AdminUI -> API : POST /routing/auto-plan/approve
+API -> Auth : validate admin token
+Auth --> API : OK
+API -> TripSvc : approve plan
+TripSvc -> DB : mark plan APPROVED; store finalized routes
+TripSvc -> Kafka : publish plan events
+Kafka --> TripSvc : ack
+TripSvc --> API : ok
+API --> AdminUI : plan approved
+
+note over AdminUI
+end note
 @enduml

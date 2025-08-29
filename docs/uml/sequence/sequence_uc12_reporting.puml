@@ -1,17 +1,58 @@
 @startuml
-title Sequence - UC-12 Xem báo cáo & thống kê
+title Sequence - UC-12 Báo cáo & Thống kê (khớp pipeline)
 actor "Admin Dashboard" as AdminUI
 participant "API Gateway" as API
 participant "Auth Service" as Auth
 participant "Analytics Service" as Analytics
+collections "Cache" as Cache
+queue "Kafka" as Kafka
+participant "Spark ETL" as Spark
 database "DB" as DB
+database "S3" as S3
+participant "Scheduler" as Scheduler
 
-AdminUI -> API : GET /reports?type=utilization
+' 1) User initiates a report request
+AdminUI -> API : GET /reports?type=...&range=...
 API -> Auth : validate admin token
 Auth --> API : OK
-API -> Analytics : fetch report
-Analytics -> DB : query aggregates
-DB --> Analytics : dataset
-Analytics --> API : report data
-API --> AdminUI : render charts/tables
+
+' 2) API requests report from Analytics
+API -> Analytics : get report(type, range)
+
+' 3) Check cache first
+Analytics -> Cache : check dataset
+alt Cache hit
+  Cache --> Analytics : cached dataset
+  Analytics --> API : dataset
+  API --> AdminUI : render charts/tables
+else Cache miss
+  ' 4) Use/Trigger latest aggregates path
+  Analytics -> Analytics : use/trigger latest aggregates
+  
+  ' 5) Parallel data processing & scheduling per pipeline
+  par Streaming/Bulk ingest & ETL
+    Analytics -> Kafka : ingest events (gps, checkin, trips)
+    Analytics -> Spark : run ETL job\n(cleanse, join, aggregate)
+    Spark -> DB : persist aggregates (fact tables)
+    Spark -> S3 : persist aggregates (parquet) and Scheduling
+    Scheduler -> Analytics : daily batch recomputation
+    alt Missing partitions?
+      Scheduler -> Analytics : backfill missing partitions
+    end
+  end
+
+  ' 6) Query aggregates for the request
+  API -> Analytics : query aggregates(type, range)
+  Analytics -> DB : read aggregates
+  DB --> Analytics : rows
+  
+  ' 7) Compute KPIs and format
+  Analytics -> Analytics : compute KPIs\n(on-time %, utilization, check-in ratio)
+  Analytics -> Analytics : format result dataset
+  
+  ' 8) Cache and return
+  Analytics -> Cache : cache result (TTL)
+  Analytics --> API : dataset
+  API --> AdminUI : render charts/tables
+end
 @enduml

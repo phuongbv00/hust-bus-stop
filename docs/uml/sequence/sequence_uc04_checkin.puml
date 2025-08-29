@@ -1,34 +1,38 @@
 @startuml
 title Sequence - UC-04 Check-in khi lên xe (QR + offline)
-actor "Student App" as StudentApp
+actor "Student" as Student
+participant "Student App" as StudentApp
 participant "API Gateway" as API
 participant "Auth Service" as Auth
-participant "Check-in Service" as Checkin
+participant "Trip Service" as TripSvc
 database "DB" as DB
 participant "Notification Service" as Notif
 participant "Driver App" as DriverApp
 participant "Kafka" as Kafka
 
-== Online flow ==
-StudentApp -> API : Scan QR (tripId, token)
-API -> Auth : validate access token
-Auth --> API : OK
-API -> Checkin : validate QR, check trip window
-Checkin -> DB : read Trip/Enrollment
-DB --> Checkin : data
-Checkin -> DB : insert CheckIn(record)
-Checkin --> API : success
-API -> Notif : send "check-in success"
-Notif -> DriverApp : push (optional)
-API --> StudentApp : success message
-API -> Kafka : publish checkin event
-
-== Offline alternative ==
-StudentApp -> StudentApp : store check-in locally (no network)
-... Later when network available ...
-StudentApp -> API : sync pending check-ins
-API -> Checkin : validate & persist
-Checkin -> DB : upsert
-API --> StudentApp : sync result
-API -> Kafka : publish checkin events
+Student -> StudentApp : Scan QR
+StudentApp -> StudentApp: decode QR (tripId, token)
+alt Network available (online)
+  StudentApp -> API : /check-in (tripId, token)
+  ref over StudentApp, API, Auth
+    UC-16 Authorization Flow
+  end ref
+  API -> TripSvc : validate QR, check trip window
+  TripSvc -> DB : read Trip/Enrollment
+  DB --> TripSvc : data
+  TripSvc -> DB : insert CheckIn(record)
+  TripSvc --> API : success
+  API -> Notif : send "check-in success"
+  Notif -> DriverApp : push (optional)
+  API --> StudentApp : success message
+  API -> Kafka : publish checkin event
+else No network (offline)
+  StudentApp -> StudentApp : store check-in locally
+  ... Later when network available ...
+  StudentApp -> API : sync pending check-ins
+  API -> TripSvc : validate & persist
+  TripSvc -> DB : upsert
+  API --> StudentApp : sync result
+  API -> Kafka : publish checkin events
+end
 @enduml

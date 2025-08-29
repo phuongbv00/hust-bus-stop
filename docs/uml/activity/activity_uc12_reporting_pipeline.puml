@@ -24,6 +24,6 @@ end fork
 :Compute KPIs (on-time %, utilization, check-in ratio);
 :Format result dataset;
 :Cache result for TTL;
-:Return report to dashboard;
+:Render charts/tables;
 stop
 @enduml

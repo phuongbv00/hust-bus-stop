@@ -16,7 +16,7 @@ Notif -> DB : upsert device token
 DB --> Notif : ok
 API --> StudentApp : ok
 
-== Sự kiện kích hoạt ==
+== Nhận thông báo đẩy ==
 TripSvc -> Kafka : publish trip ETA soon
 Checkin -> Kafka : publish check-in created
 

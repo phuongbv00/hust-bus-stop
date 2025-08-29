@@ -24,8 +24,7 @@ repeat
 repeat while (unassigned trips remain?) is (yes)
 
 :Compute KPIs (utilization, overtime risk);
-:Persist proposed assignments;
-:Publish dispatch plan event;
+:Persist proposed trip;
 
 if (Admin manual adjustments?) then (yes)
   :Apply changes (swap driver/vehicle);
@@ -37,11 +36,11 @@ if (Admin manual adjustments?) then (yes)
   endif
 endif
 
-if (Approve plan?) then (yes)
-  :Mark plan APPROVED;
+if (Approve trip?) then (yes)
+  :Mark trip APPROVED;
   :Notify drivers (push messages);
 else (no)
-  :Keep plan DRAFT;
+  :Keep trip DRAFT;
 endif
 stop
 @enduml

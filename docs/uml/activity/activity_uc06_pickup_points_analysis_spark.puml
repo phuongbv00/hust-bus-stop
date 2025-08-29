@@ -1,0 +1,21 @@
+@startuml
+title Activity - UC-06 Phân tích & Thiết lập điểm đón tự động
+start
+
+:(1) Load student coordinates (from enrollment) & road GeoJSON;
+:(2) Estimate ε using K-distance graph;
+:(3) Estimate k using DBSCAN;
+
+repeat :(4) Run clustering with KMeans (k clusters);
+  :(5) Evaluate coverage_ratio within walk_max_distance;
+
+backward :(6) Increase k by δ;
+
+repeat while (coverage_ratio < THRESH_HOLD?) is (yes)
+-> no;
+
+:(7) Find pickup stops (nearest road point from cluster centroid);
+:(8) Assign student enrollments to corresponding bus stop;
+
+stop
+@enduml

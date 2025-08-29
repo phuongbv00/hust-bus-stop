@@ -10,13 +10,8 @@ if (Any device tokens?) then (yes)
   :Build platform-specific payloads;
   fork
     :Send to FCM (Android/Web);
-    :Handle responses ->
-     - success
-     - invalid token
-     - rate limit;
   fork again
     :Send to APNS (iOS);
-    :Handle responses similarly;
   end fork
   :Update delivery logs;
   :Deactivate invalid tokens;

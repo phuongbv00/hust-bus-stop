@@ -1,80 +1,86 @@
 @startuml
-title Deployment Diagram - Hệ thống Quản lý Xe buýt Sinh viên
-skinparam nodeStyle rectangle
+'title updated to reflect K8s-based deployment aligned with component architecture
+Title Deployment Diagram - Kubernetes Architecture
+
 left to right direction
 
+' Client devices
 node "Sinh viên Device" {
   artifact "Mobile App (Student)" as AppStudent
 }
-
 node "Tài xế Device" {
   artifact "Mobile App (Driver)" as AppDriver
 }
-
 node "Admin Workstation" {
-  artifact "Web Browser" as Browser
+  artifact "Web Browser (Admin Dashboard)" as Browser
 }
 
-node "Internet / CDN" as CDN
+cloud "Internet / CDN" as CDN
 
 node "DMZ" {
-  node "Load Balancer / API Gateway" as LB
+  node "K8s Ingress Controller\n(+ API Gateway)" as Ingress
 }
 
-node "App Cluster" {
-  node "App Server" as AppSrv {
-    artifact "BFF/API Service" as API
-    artifact "Realtime WS" as WS
+node "Kubernetes Cluster" as K8s {
+  frame "Namespace: gateway" as ns_gw {
+    component "API Gateway\n(Deployment/Service)" as APIGW
   }
-}
 
-node "Streaming Cluster" {
-  node "Kafka Cluster" as Kafka {
-    artifact "Topics: gps, checkin, trips, dispatch" as Topics
+  frame "Namespace: app" as ns_app {
+    node "Auth Service\n(Deployment + ClusterIP Service)" as Auth
+    node "User & Enrollment Service\n(Deployment + ClusterIP Service)" as UserSvc
+    node "Trip & Route Service\n(Deployment + ClusterIP Service)" as TripSvc
+    node "Notification Service\n(Deployment + ClusterIP Service)" as NotifSvc
+    node "GPS Ingestion & Realtime Service\n(Deployment + ClusterIP Service)" as GPSSvc
+    node "Analytics & Reporting Service\n(Deployment + ClusterIP Service)" as AnalyticsSvc
   }
-}
 
-node "Batch/Analytics" {
-  node "Spark Cluster" as Spark {
-    artifact "Batch Jobs (UC-06, UC-08, UC-09, UC-12)" as BatchJobs
+  frame "Namespace: data" as ns_data {
+    queue "Kafka\n(StatefulSet)" as Kafka
+    database "PostgreSQL\n(StatefulSet/Managed)" as DB
+    node "Object Storage (MinIO/S3)\n(StatefulSet/External)" as S3
   }
+
+  frame "Namespace: spark" as ns_spark {
+    node "Spark Cluster" as SparkCluster {
+      node "Spark Master" as SparkMaster
+      node "Spark Worker 1" as SparkW1
+      node "Spark Worker 2" as SparkW2
+      node "Spark Worker 3" as SparkW3
+    }
+    component "Spark Connect\n(Client)" as SparkConnect
+  }
+
+  ' Spark internal wiring
+  SparkConnect --> SparkMaster
+  SparkMaster --> SparkW1
+  SparkMaster --> SparkW2
+  SparkMaster --> SparkW3
 }
 
-node "Data Layer" {
-  database "PostgreSQL" as DB
-  node "Object Storage (S3)" as S3
-}
-
-node "External Services" {
+package "External Services" {
   node "IdP (Google/Azure)" as IdP
   node "APNS/FCM" as Push
   node "Map/Traffic API" as MapAPI
 }
 
-' Client connections
+' Client connections via CDN -> Ingress -> Gateway
 AppStudent --> CDN
 AppDriver --> CDN
 Browser --> CDN
-CDN --> LB
-LB --> AppSrv
+CDN --> Ingress
+Ingress --> APIGW
 
-' Intra service
-API --> DB
-API --> WS
-WS --> Kafka
-API --> Kafka
-Spark --> Kafka
-Spark --> S3
-Spark --> DB
+' Gateway routes to internal microservices (simplified via namespace)
+APIGW --> ns_app
 
-' External integrations
-API --> IdP : OAuth2/OIDC
-API --> Push : send notifications
-API --> MapAPI : routing/ETA
+' Service-to-data interactions (simplified via namespace)
+ns_app --> ns_data
+ns_spark --> ns_data
 
-' Flows of interest
-AppDriver --> LB : GPS updates (HTTPS)
-LB --> WS : WebSocket broadcast to Student/Admin
-API --> Kafka : publish check-in, trip events
+' External integrations (simplified via namespace)
+ns_app --> "External Services"
+
+
 
 @enduml
