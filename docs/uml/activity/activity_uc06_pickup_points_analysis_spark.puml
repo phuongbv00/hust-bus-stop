@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-06 Phân tích & Thiết lập điểm đón tự động
 start
 
 :(1) Load student coordinates (from enrollment) & road GeoJSON;

@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-16 Xác thực và uỷ quyền (OAuth2/OIDC - Authorization Code with PKCE)
 actor "User" as User
 participant "Client App/Web" as Client
 participant "API Gateway" as API

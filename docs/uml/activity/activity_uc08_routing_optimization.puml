@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-08 Tự động tạo lộ trình & lịch trình (TSP-based)
 start
 :Admin trigger "Tạo lộ trình tự động";
 :Load approved pickup stops (from UC-06);

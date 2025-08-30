@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-06 Phân tích & thiết lập điểm đón tự động
 actor "Admin Dashboard" as AdminUI
 participant "API Gateway" as API
 participant "Auth Service" as Auth

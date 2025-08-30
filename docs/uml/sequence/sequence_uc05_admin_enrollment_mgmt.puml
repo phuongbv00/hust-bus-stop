@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-05 Quản lý đăng ký của sinh viên
 actor "Admin" as Admin
 participant "Admin Dashboard" as AdminUI
 participant "API Gateway" as API

@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-14 Tài xế xem nhiệm vụ & lộ trình
 actor "Driver App" as DriverApp
 participant "API Gateway" as API
 participant "Auth Service" as Auth

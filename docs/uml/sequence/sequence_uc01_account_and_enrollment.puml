@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-01 Quản lý tài khoản & đăng ký dịch vụ
 actor "Student" as Student
 participant "Student App" as StudentApp
 participant "API Gateway" as API

@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-02 Xem lịch trình & theo dõi xe realtime
 actor "Student" as Student
 participant "Student App" as StudentApp
 participant "API Gateway" as API

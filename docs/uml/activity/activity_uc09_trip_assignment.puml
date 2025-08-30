@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-09 Tự động điều phối phương tiện
 start
 :Scheduled time reached (e.g., 16:00 daily);
 :Load next-day trips (routes, ETAs, capacities);

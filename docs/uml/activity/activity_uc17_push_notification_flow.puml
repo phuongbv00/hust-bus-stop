@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-17 Gửi thông báo đẩy (Flow)
 start
 :Receive notification request
 (event/userIds, title, body, data);

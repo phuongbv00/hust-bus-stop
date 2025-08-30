@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-18 Xử lý dữ liệu vị trí GPS (Ingest & Broadcast)
 start
 :Driver app emits GPS (lat, lon, time, tripId);
 :API receives and authenticates request;

@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-03 Nhận thông báo tự động
 actor "Student App" as StudentApp
 participant "API Gateway" as API
 participant "Notification Service" as Notif

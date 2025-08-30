@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-11 Gửi thông báo khẩn cấp
 actor "Admin Dashboard" as AdminUI
 participant "API Gateway" as API
 participant "Auth Service" as Auth

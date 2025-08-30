@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-07 Quản lý phương tiện & tài xế
 actor "Admin Dashboard" as AdminUI
 participant "API Gateway" as API
 participant "Auth Service" as Auth

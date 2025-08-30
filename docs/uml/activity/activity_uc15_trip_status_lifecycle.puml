@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-15 Cập nhật trạng thái chuyến đi (Lifecycle)
 start
 :Driver opens trip detail;
 :Show actions: START, ARRIVED at stop, FINISH;

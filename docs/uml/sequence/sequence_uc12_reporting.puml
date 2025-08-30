@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-12 Báo cáo & Thống kê (khớp pipeline)
 actor "Admin Dashboard" as AdminUI
 participant "API Gateway" as API
 participant "Auth Service" as Auth

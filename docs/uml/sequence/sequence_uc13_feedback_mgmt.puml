@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-13 Quản lý phản hồi của người dùng
 actor "Admin Dashboard" as AdminUI
 actor "Student App" as StudentApp
 participant "API Gateway" as API

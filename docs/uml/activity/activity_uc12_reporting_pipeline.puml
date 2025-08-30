@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-12 Báo cáo & Thống kê (Pipeline)
 start
 :Define report request (type, time range);
 :Check cache for precomputed dataset;

@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-15 Tài xế cập nhật trạng thái chuyến đi
 actor "Driver App" as DriverApp
 participant "API Gateway" as API
 participant "Auth Service" as Auth

@@ -1,5 +1,4 @@
 @startuml
-title Activity - UC-04 Check-in khi lên xe (QR + Offline Sync)
 start
 :Open app -> Check-in;
 :Scan QR (tripId);

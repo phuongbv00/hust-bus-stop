@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-04 Check-in khi lên xe (QR + offline)
 actor "Student" as Student
 participant "Student App" as StudentApp
 participant "API Gateway" as API

@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-18 GPS Realtime (Driver -> Students/Admin)
 actor "Driver App" as DriverApp
 participant "API Gateway" as API
 participant "Auth Service" as Auth

@@ -1,5 +1,4 @@
 @startuml
-title Sequence - UC-17 Gửi thông báo đẩy (Push Notification)
 participant "Event Producer (Any UC)" as Producer
 participant "Notification Service" as Notif
 database "DB" as DB
