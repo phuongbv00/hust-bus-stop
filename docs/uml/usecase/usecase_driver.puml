@@ -1,5 +1,4 @@
 @startuml
-title Use Case - Actor: Tài xế
 left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome

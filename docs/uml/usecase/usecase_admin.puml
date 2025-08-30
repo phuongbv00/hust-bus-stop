@@ -1,5 +1,4 @@
 @startuml
-title Use Case - Tác nhân: Quản trị viên
 left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome

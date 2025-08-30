@@ -1,7 +1,4 @@
 @startuml
-'title updated to reflect K8s-based deployment aligned with component architecture
-Title Deployment Diagram - Kubernetes Architecture
-
 left to right direction
 
 ' Client devices

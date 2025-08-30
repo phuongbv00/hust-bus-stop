@@ -1,5 +1,4 @@
 @startuml
-title Class Diagram - Domain Model
 skinparam classAttributeIconSize 0
 
 class User {

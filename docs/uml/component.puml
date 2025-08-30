@@ -1,6 +1,4 @@
 @startuml
-title Component Architecture
-
 left to right direction
 
 actor "Student" as Student
